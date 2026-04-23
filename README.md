@@ -18,8 +18,8 @@ However, the design is intentionally open so that organizations can model their 
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env        # add your GITHUB_TOKEN (no scopes needed for public orgs)
-cp .invariants .invariants.yourorg   # edit for your org, then run:
+cp .env.example .env                   # add your GITHUB_TOKEN (no scopes needed for public orgs)
+cp .invariants .invariants.yourorg     # edit for your org, then run:
 python watcher.py .invariants.yourorg
 ```
 
@@ -127,7 +127,7 @@ Score = (earned / max) × 100. Reported at the top of every run.
 ## Project structure
 
 ```
-invariants-watcher/
+.
   watcher.py                    # entry point
   report.py                     # output formatter and scorer
   fetchers/

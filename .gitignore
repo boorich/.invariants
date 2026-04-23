@@ -2,11 +2,10 @@
 SPEC.md
 
 # ── org-specific invariant files (never commit real orgs) ────
-invariants-watcher/.invariants.chainsafe
-invariants-watcher/.invariants.sprinter
+.invariants.*
 
 # ── secrets ──────────────────────────────────────────────────
-invariants-watcher/.env
+.env
 
 # ── Python build artifacts ───────────────────────────────────
 __pycache__/
