@@ -1,0 +1,51 @@
+# Built-in assert bundle for engineering-led companies
+# Referenced by name in .invariants suite field
+
+id: engineering_led_v1
+description: "Core asserts for an engineering-led organization"
+
+asserts:
+  - id: active_commit_authors
+    claim: "More than 3 engineers actively committing"
+    source: github_activity
+    condition:
+      metric: unique_active_authors_90d
+      operator: ">"
+      threshold: 3
+    evidence_template: "{value} unique authors with commits in last 90 days"
+
+  - id: pr_merge_velocity
+    claim: "PRs merging at least weekly across primary repos"
+    source: github_activity
+    condition:
+      metric: merged_prs_30d
+      operator: ">"
+      threshold: 4
+    evidence_template: "{value} PRs merged in last 30 days"
+
+  - id: newest_repo_age
+    claim: "New non-fork repo created in last 180 days"
+    source: github_activity
+    condition:
+      metric: newest_non_fork_days_old
+      operator: "<"
+      threshold: 180
+    evidence_template: "Newest non-fork repo is {value} days old"
+
+  - id: delivery_continuity
+    claim: "Org has pushed code in last 7 days"
+    source: github_activity
+    condition:
+      metric: most_recent_push_days_ago
+      operator: "<"
+      threshold: 7
+    evidence_template: "Most recent push was {value} days ago"
+
+  - id: open_source_health
+    claim: "Primary repos have external contributors"
+    source: github_activity
+    condition:
+      metric: has_external_contributors
+      operator: "=="
+      threshold: true
+    evidence_template: "External contributors detected: {value}"

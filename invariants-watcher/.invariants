@@ -1,0 +1,376 @@
+# .invariants.example
+#
+# Copy this file to your org's .github repo and rename it .invariants
+# Uncomment the asserts you can support today.
+# Leave the rest commented — they show you what to build toward.
+#
+# Each assert has a tier:
+#   external  — fetched automatically from public sources, no org participation needed
+#   internal  — requires your org to push verified signals
+#   manual    — requires human input, not automatable yet (future tier)
+#
+# Most asserts start as UNKNOWN. That's expected.
+# The file is the roadmap. UNKNOWN means "not yet proven", not "failing".
+#
+# Convention: asserting something is not the same as achieving it.
+# Place only asserts you are willing to be held to.
+
+version: 1.0
+entity: "Your Company Name"
+org: "your-github-org"
+since: "YYYY-MM-DD"           # date you placed this file — proof history starts here
+
+# ─────────────────────────────────────────────
+# WATCHERS
+# Declare which external sources the agent observes.
+# Only uncomment sources you have access to.
+# ─────────────────────────────────────────────
+
+watchers:
+  - github_activity           # tier: external — commits, PRs, authors, repos
+  # - job_postings            # tier: external — titles, stack signals, seniority
+  # - engineering_blog        # tier: external — publication frequency, authorship
+  # - open_source_footprint   # tier: external — contributions outside own repos
+  # - linkedin_signals        # tier: external — headcount, movement, tenure
+
+# ─────────────────────────────────────────────
+# SUITE
+# Built-in assert bundle. Pick one.
+# ─────────────────────────────────────────────
+
+suite: engineering_led_v1
+
+# ─────────────────────────────────────────────
+# FOUNDING TEAM
+# The most important cluster for early stage.
+# When founding team asserts break, everything else is downstream.
+# ─────────────────────────────────────────────
+
+founding_team_handles:        # GitHub handles of technical founders
+  - yourhandle
+
+custom_asserts:
+
+  # tier: external
+  - id: founding_team_still_coding
+    claim: "At least one technical founder is actively committing"
+    source: github_activity
+    condition:
+      metric: founding_team_active_committers
+      operator: ">"
+      threshold: 0
+    evidence_template: "{value} founding team member(s) with commits in last 90 days"
+    why: >
+      When technical founders stop committing the org begins optimizing
+      for delivery over exploration. This is the earliest detectable
+      signal of strategic drift.
+
+  # tier: internal — requires push signal
+  # - id: founding_team_product_depth
+  #   claim: "Founding team conducts at least 4 customer interviews per month"
+  #   source: internal_push
+  #   condition:
+  #     metric: customer_interviews_30d
+  #     operator: ">="
+  #     threshold: 4
+  #   evidence_template: "{value} customer interviews logged in last 30 days"
+  #   why: >
+  #     Founders who stop talking to customers stop understanding the problem.
+  #     This breaks faster than the code does.
+
+# ─────────────────────────────────────────────
+# ENGINEERING ACTIVITY
+# Is the org actually building?
+# ─────────────────────────────────────────────
+
+  # tier: external
+  - id: active_commit_authors
+    claim: "More than 3 engineers actively committing"
+    source: github_activity
+    condition:
+      metric: unique_active_authors_90d
+      operator: ">"
+      threshold: 3
+    evidence_template: "{value} unique authors with commits in last 90 days"
+    why: >
+      Below 3 active authors the org is dangerously concentrated.
+      A single departure breaks delivery.
+
+  # tier: external
+  - id: delivery_continuity
+    claim: "Org has pushed code in last 7 days"
+    source: github_activity
+    condition:
+      metric: most_recent_push_days_ago
+      operator: "<"
+      threshold: 7
+    evidence_template: "Most recent push was {value} days ago"
+    why: >
+      A one-week gap in any commit activity is a hard stop signal.
+      Acceptable during planned breaks if disclosed.
+
+  # tier: external
+  - id: pr_merge_velocity
+    claim: "PRs merging at least weekly"
+    source: github_activity
+    condition:
+      metric: merged_prs_30d
+      operator: ">"
+      threshold: 4
+    evidence_template: "{value} PRs merged in last 30 days"
+    why: >
+      Below weekly merge cadence indicates either trust deficit,
+      review bottleneck, or bandwidth collapse.
+
+  # tier: external
+  - id: newest_repo_age
+    claim: "New non-fork repo created in last 180 days"
+    source: github_activity
+    condition:
+      metric: newest_non_fork_days_old
+      operator: "<"
+      threshold: 180
+    evidence_template: "Newest non-fork repo is {value} days old"
+    why: >
+      New repos signal new initiatives. An org that stops starting
+      new things has stopped exploring.
+
+# ─────────────────────────────────────────────
+# LEARNING SIGNALS
+# Is the org getting smarter or just executing?
+# ─────────────────────────────────────────────
+
+  # tier: external
+  - id: ai_tooling_active
+    claim: "AI-adjacent repos exist with recent activity"
+    source: github_activity
+    condition:
+      metric: active_ai_repos
+      operator: ">"
+      threshold: 0
+    evidence_template: "{value} AI-adjacent repos pushed in last 90 days"
+    why: >
+      An engineering org with zero active AI tooling in 2026
+      is not adapting. This assert will become table stakes
+      for any serious investor conversation.
+
+  # tier: external
+  - id: stack_coherence
+    claim: "Job descriptions match actual stack in repos"
+    source: github_activity
+    condition:
+      metric: jd_stack_match_score
+      operator: ">"
+      threshold: 0.7
+    evidence_template: "Stack coherence score: {value}"
+    why: >
+      Recruiting for skills not present in your repos means
+      either the stack is changing faster than your comms
+      or your recruiting is aspirational theatre.
+
+  # tier: external
+  - id: open_source_health
+    claim: "Primary repos have external contributors"
+    source: github_activity
+    condition:
+      metric: has_external_contributors
+      operator: "=="
+      threshold: true
+    evidence_template: "External contributors detected: {value}"
+    why: >
+      External contributors signal the work is legible and
+      valuable to people outside the org. Purely internal
+      contribution patterns indicate isolation.
+
+# ─────────────────────────────────────────────
+# FINANCIAL HEALTH PROXIES
+# Not financials themselves — behavioral signals
+# that correlate with financial health.
+# All require internal push signals.
+# ─────────────────────────────────────────────
+
+  # tier: internal — requires push signal
+  # - id: runway_adequate
+  #   claim: "Runway exceeds 12 months"
+  #   source: internal_push
+  #   condition:
+  #     metric: runway_months
+  #     operator: ">"
+  #     threshold: 12
+  #   evidence_template: "Runway assertion: {value}"
+  #   why: >
+  #     Below 12 months the org begins making fear-based decisions.
+  #     This assert does not expose the actual number —
+  #     only a verified boolean that the condition holds.
+
+  # tier: internal — requires push signal
+  # - id: burn_rate_controlled
+  #   claim: "Monthly burn is not increasing quarter over quarter"
+  #   source: internal_push
+  #   condition:
+  #     metric: burn_increasing_qoq
+  #     operator: "=="
+  #     threshold: false
+  #   evidence_template: "Burn rate stable or decreasing: {value}"
+  #   why: >
+  #     Increasing burn without increasing revenue is a structural
+  #     warning sign regardless of current runway.
+
+  # tier: internal — requires push signal
+  # - id: revenue_signal
+  #   claim: "Monthly recurring revenue is positive and growing"
+  #   source: internal_push
+  #   condition:
+  #     metric: mrr_growing
+  #     operator: "=="
+  #     threshold: true
+  #   evidence_template: "MRR growth assertion: {value}"
+  #   why: >
+  #     For post-revenue startups this is the most important
+  #     single assert. For pre-revenue, leave commented.
+
+# ─────────────────────────────────────────────
+# PEOPLE HEALTH
+# Are the right humans doing the right things?
+# ─────────────────────────────────────────────
+
+  # tier: external
+  - id: team_size_stable
+    claim: "Headcount has not dropped more than 20% in 90 days"
+    source: linkedin_signals
+    condition:
+      metric: headcount_drop_90d_pct
+      operator: "<"
+      threshold: 0.2
+    evidence_template: "Headcount change in 90 days: {value}"
+    why: >
+      A sudden headcount drop is a leading indicator of
+      financial distress or leadership breakdown.
+      Gradual decline is different from sudden departure.
+
+  # tier: internal — requires push signal
+  # - id: key_person_retention
+  #   claim: "No key person departures in last 90 days"
+  #   source: internal_push
+  #   condition:
+  #     metric: key_person_departures_90d
+  #     operator: "=="
+  #     threshold: 0
+  #   evidence_template: "Key person departures: {value}"
+  #   why: >
+  #     Define key persons in your own context.
+  #     The org defines who is load-bearing. This assert
+  #     holds them accountable to monitoring that.
+
+  # tier: internal — requires push signal
+  # - id: hiring_velocity
+  #   claim: "At least one engineering hire per quarter"
+  #   source: internal_push
+  #   condition:
+  #     metric: eng_hires_90d
+  #     operator: ">="
+  #     threshold: 1
+  #   evidence_template: "{value} engineering hires in last 90 days"
+  #   why: >
+  #     An org that stops hiring engineers has either reached
+  #     capacity or stopped growing. Both warrant attention.
+
+# ─────────────────────────────────────────────
+# DELIVERY INTEGRITY
+# Is what the org says it's building what it's actually building?
+# ─────────────────────────────────────────────
+
+  # tier: external
+  - id: milestone_health
+    claim: "No public milestones overdue by more than 30 days"
+    source: github_activity
+    condition:
+      metric: overdue_milestones_30d
+      operator: "=="
+      threshold: 0
+    evidence_template: "{value} milestones overdue by more than 30 days"
+    why: >
+      Publicly visible overdue milestones are the most
+      avoidable due diligence red flag. An investor doing
+      basic research finds these in 5 minutes.
+
+  # tier: internal — requires push signal
+  # - id: roadmap_coherence
+  #   claim: "Current sprint work maps to stated roadmap"
+  #   source: internal_push
+  #   condition:
+  #     metric: roadmap_alignment_score
+  #     operator: ">"
+  #     threshold: 0.7
+  #   evidence_template: "Roadmap alignment score: {value}"
+  #   why: >
+  #     Orgs that consistently build things not on their roadmap
+  #     have either a planning problem or a communication problem.
+  #     Both are visible to employees before they're visible to investors.
+
+# ─────────────────────────────────────────────
+# IDENTITY COHERENCE
+# Is the company still the thing it set out to be?
+# ─────────────────────────────────────────────
+
+  # tier: external
+  - id: artifact_velocity_consistent
+    claim: "Commit velocity has not spiked anomalously before known events"
+    source: github_activity
+    condition:
+      metric: commit_velocity_anomaly
+      operator: "=="
+      threshold: false
+    evidence_template: "Anomalous velocity detected: {value}"
+    why: >
+      A sudden spike in commits immediately before a fundraise
+      or acquisition process is preparation theatre.
+      Consistent orgs look the same before and after they know
+      they're being watched.
+
+  # tier: external — for orgs that have undergone rebranding
+  # - id: identity_transition_complete
+  #   claim: "No active legacy-branded repos remain"
+  #   source: github_activity
+  #   condition:
+  #     metric: active_legacy_repos
+  #     operator: "=="
+  #     threshold: 0
+  #   evidence_template: "{value} active legacy-branded repos detected"
+  #   why: >
+  #     An org mid-transition has two identities competing.
+  #     This assert tracks whether the transition is real
+  #     or just a new name on old infrastructure.
+
+# ─────────────────────────────────────────────
+# DISCLOSURE
+# Controls what gets proven and where proofs are stored.
+# ─────────────────────────────────────────────
+
+disclosure:
+  default: private             # proofs stored locally, never exposed
+  on_request: selective        # you choose what to share and with whom
+  verified_claims: off         # set to on_chain when proof layer is ready
+  chain: starknet              # proof destination when enabled
+
+# ─────────────────────────────────────────────
+# SCHEDULE
+# ─────────────────────────────────────────────
+
+schedule: daily
+alert_on_fail: true
+
+# ─────────────────────────────────────────────
+# NOTES FOR FOUNDERS
+#
+# Start with what you can prove today.
+# UNKNOWN is not failure — it means unproven.
+# The asserts you leave commented are your instrumentation roadmap.
+#
+# The ledger starts accumulating the moment you place this file.
+# Every day of clean proof history is an asset.
+# You cannot retroactively build history — start now.
+#
+# When you are ready to raise or sell, your assert history
+# is the most honest document you own.
+# ─────────────────────────────────────────────
